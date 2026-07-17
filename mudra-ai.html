@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neya Navarasa – Mudra AI Assistant</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .page-mudra-ai {
+      background: linear-gradient(180deg, rgba(234, 228, 221, 1), rgba(181, 162, 147, 0.16));
+    }
+
+    .ai-hero {
+      max-width: 1000px;
+    }
+
+    .ai-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .camera-panel, .chat-panel {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid rgba(92, 74, 63, 0.2);
+      border-radius: 1rem;
+      padding: 1.5rem;
+    }
+
+    .camera-panel h2, .chat-panel h2 {
+      font-size: 1.2rem;
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    #video-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1a1a1a;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      margin-bottom: 1rem;
+    }
+
+    #video,
+    #canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      inset: 0;
+    }
+
+    #canvas {
+      display: none;
+      z-index: 1;
+    }
+
+    .camera-controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-camera {
+      flex: 1;
+      min-width: 120px;
+      padding: 0.75rem 1rem;
+      background: var(--accent-red);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-camera:hover {
+      background: #c12b1a;
+      transform: translateY(-1px);
+    }
+
+    .btn-camera:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .auto-capture-timer {
+      margin-top: 0.85rem;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 600;
+      min-height: 1.2rem;
+    }
+
+    .btn-secondary {
+      background: rgba(92, 74, 63, 0.2);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(92, 74, 63, 0.3);
+    }
+
+    #chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      border: 1px solid rgba(92, 74, 63, 0.15);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(245, 239, 231, 0.5);
+    }
+
+    .message {
+      margin-bottom: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .message.user {
+      justify-content: flex-end;
+    }
+
+    .message-content {
+      max-width: 75%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .message.ai .message-content {
+      background: rgba(75, 138, 150, 0.1);
+      border-left: 3px solid var(--peacock-blue);
+    }
+
+    .message.user .message-content {
+      background: var(--accent-red);
+      color: white;
+    }
+
+    .chat-input-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    #chat-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid rgba(92, 74, 63, 0.2);
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    #chat-input:focus {
+      outline: none;
+      border-color: var(--accent-red);
+      box-shadow: 0 0 0 2px rgba(209, 59, 48, 0.1);
+    }
+
+    .btn-send {
+      padding: 0.75rem 1.5rem;
+      background: var(--accent-red);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-send:hover {
+      background: #c12b1a;
+      transform: translateY(-1px);
+    }
+
+    .recognition-result {
+      background: rgba(34, 139, 34, 0.1);
+      border: 1px solid rgba(34, 139, 34, 0.3);
+      border-radius: 0.75rem;
+      padding: 1rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .recognition-result.show {
+      display: block;
+      animation: slideIn 0.3s ease;
+    }
+
+    .recognition-result h3 {
+      margin-top: 0;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .recognition-result p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    .mudra-source {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 1rem;
+      height: 1rem;
+      border: 2px solid rgba(209, 59, 48, 0.3);
+      border-top-color: var(--accent-red);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-auth {
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font: inherit;
+      font-weight: 600;
+      text-decoration: underline dashed rgba(92, 74, 63, 0.5);
+      text-underline-offset: 4px;
+      cursor: pointer;
+      opacity: 0.88;
+      transition: opacity 0.2s ease, color 0.2s ease;
+    }
+
+    .btn-auth:hover {
+      opacity: 1;
+      color: var(--accent-red);
+      text-decoration-color: var(--accent-red);
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(21, 21, 21, 0.6);
+      padding: 1.5rem;
+      z-index: 9999;
+    }
+
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-dialog {
+      width: min(520px, 100%);
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 24px 60px rgba(21, 21, 21, 0.18);
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      border: none;
+      background: transparent;
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--text-primary);
+    }
+
+    .modal-header h2 {
+      margin: 0 0 0.4rem;
+      font-size: 1.5rem;
+    }
+
+    .modal-header p {
+      margin: 0 0 1.5rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .modal-dialog label {
+      display: block;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+    }
+
+    .modal-dialog input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border: 1px solid rgba(92, 74, 63, 0.2);
+      border-radius: 0.75rem;
+      margin-top: 0.35rem;
+      font: inherit;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .auth-feedback {
+      margin-top: 1rem;
+      color: var(--accent-red);
+      font-size: 0.9rem;
+    }
+
+    .image-grid-section {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .image-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(92, 74, 63, 0.1);
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 14px 30px rgba(21, 21, 21, 0.08);
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      background: #f3efe9;
+    }
+
+    .image-card figcaption {
+      padding: 1rem;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .site-header {
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .main-nav.open {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 1rem;
+      padding: 1rem 0;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .main-nav.open ul {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    @media (max-width: 960px) {
+      .ai-container {
+        grid-template-columns: 1fr;
+      }
+
+      #chat-messages {
+        height: 300px;
+      }
+
+      .message-content {
+        max-width: 90%;
+      }
+    }
+
+    @media (max-width: 820px) {
+      .site-header {
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+
+      .main-nav {
+        width: 100%;
+      }
+
+      .main-nav ul {
+        display: none;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      .main-nav.open ul {
+        display: flex;
+      }
+
+      .main-nav.open {
+        display: flex;
+      }
+
+      .nav-toggle {
+        display: flex;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .camera-panel,
+      .chat-panel {
+        padding: 1.25rem;
+      }
+
+      .camera-controls,
+      .chat-input-group {
+        flex-direction: column;
+      }
+
+      .camera-controls .btn-camera,
+      .chat-input-group .btn-send,
+      .chat-input-group #chat-input {
+        width: 100%;
+      }
+
+      #chat-messages {
+        height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body class="page-mudra-ai">
+  <header class="site-header">
+    <a href="index.html#hero" class="brand" aria-label="Back to homepage">
+      <div class="brand-mark" aria-hidden="true">
+        <span class="brand-initial">B</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Neya Navarasa</span>
+        <span class="brand-tagline">History, Techniques &amp; Traditions</span>
+      </div>
+    </a>
+    <nav class="main-nav">
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+      </button>
+      <ul>
+        <li><a href="index.html#intro">Home</a></li>
+        <li class="nav-dropdown">
+          <button class="nav-dropdown-toggle" type="button">
+            Explore Topics
+            <span class="nav-dropdown-caret" aria-hidden="true"></span>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="theory.html">Theory &amp; Foundations</a>
+            <a href="history.html">History</a>
+            <a href="expression.html">Expression</a>
+            <a href="mudras.html">Mudras &amp; Gestures</a>
+            <a href="adavus.html">Adavus &amp; Technique</a>
+            <a href="costume.html">Costume &amp; Makeup</a>
+            <a href="music.html">Music &amp; Instruments</a>
+            <a href="legends.html">Legends &amp; Gurus</a>
+            <a href="gallery.html">Gallery</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+    <div class="header-actions" id="auth-actions"></div>
+  </header>
+
+  <main>
+    <section class="sub-hero ai-hero">
+      <div class="breadcrumbs">
+        <a href="index.html#hero">Home</a>
+        <span>&mdash;</span>
+        <span>Mudra AI Assistant</span>
+      </div>
+      <p class="eyebrow">Interactive Learning</p>
+      <h1>Mudra Recognition AI</h1>
+      <p class="sub-hero-intro">
+        Capture or upload hand gestures with your camera and get instant mudra recognition,
+        detailed descriptions, and personalized feedback from our AI-powered mudra assistant.
+      </p>
+    </section>
+
+    <section class="section">
+      <div class="ai-container">
+        <!-- Camera Panel -->
+        <div class="camera-panel">
+          <h2>📷 Capture Mudra</h2>
+          <div id="video-container">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+          </div>
+          <div class="camera-controls">
+            <button class="btn-camera" id="start-camera">Start Camera</button>
+            <button class="btn-camera btn-secondary" id="capture-photo" disabled>Capture</button>
+            <button class="btn-camera btn-secondary" id="auto-capture" disabled>Auto Capture (30s)</button>
+            <button class="btn-camera btn-secondary" id="upload-image" title="Upload existing image">Upload Image</button>
+            <input type="file" id="file-input" accept="image/*" style="display: none;" />
+          </div>
+          <div class="auto-capture-timer" id="auto-capture-timer"></div>
+          <div class="recognition-result" id="recognition-result">
+            <h3>🎯 Detected Mudra</h3>
+            <p><strong>Name:</strong> <span id="mudra-name">—</span></p>
+            <p><strong>Confidence:</strong> <span id="mudra-confidence">—</span></p>
+            <p><strong>Meaning:</strong> <span id="mudra-meaning">—</span></p>
+            <p><strong>Usage:</strong> <span id="mudra-usage">—</span></p>
+            <p><strong>More:</strong> <a id="mudra-link" href="#" target="_blank" rel="noopener">Open mudra page</a></p>
+            <p id="mudra-source" class="mudra-source">Source: AI estimate</p>
+          </div>
+        </div>
+
+        <!-- Chat Panel -->
+        <div class="chat-panel">
+          <h2>💬 Mudra Assistant</h2>
+          <div id="chat-messages">
+            <div class="message ai">
+              <div class="message-content">
+                👋 Hello! I'm your Mudra AI Assistant. Ask me about mudras, get recognition results,
+                or learn about hand gestures in Bharatanatyam. Capture a mudra or type a question!
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-group">
+            <input type="text" id="chat-input" placeholder="Ask about mudras..." />
+            <button class="btn-send" id="send-message">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section image-grid-section">
+      <div>
+        <h2>Visual Reference Library</h2>
+        <p>Explore sample mudras, costume details, and performance expressions with curated visuals for each section.</p>
+      </div>
+      <div class="image-grid">
+        <figure class="image-card">
+          <img src="images/mudras/Pataka.jpg" alt="Pataka mudra example" />
+          <figcaption>Pataka Mudra</figcaption>
+        </figure>
+        <figure class="image-card">
+          <img src="images/mudras/Anjali.jpg" alt="Anjali mudra gesture" />
+          <figcaption>Anjali Mudra</figcaption>
+        </figure>
+        <figure class="image-card">
+          <img src="images/mudras/Mayura.jpg" alt="Mayura mudra hand pose" />
+          <figcaption>Mayura Mudra</figcaption>
+        </figure>
+        <figure class="image-card">
+          <img src="images/mudras/placeholder.svg" alt="Traditional Bharatanatyam costume details" />
+          <figcaption>Costume Detail</figcaption>
+        </figure>
+        <figure class="image-card">
+          <img src="images/mudras/placeholder.svg" alt="Facial expression in dance" />
+          <figcaption>Expression & Abhinaya</figcaption>
+        </figure>
+        <figure class="image-card">
+          <img src="images/mudras/placeholder.svg" alt="Performance stage styling" />
+          <figcaption>Performance Styling</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div style="max-width: 900px;">
+        <h2>How to Use</h2>
+        <ol style="line-height: 1.8;">
+          <li><strong>Start Camera:</strong> Click "Start Camera" to activate your device's camera.</li>
+          <li><strong>Capture or Upload:</strong> Either capture a photo of your hand gesture or upload an existing image.</li>
+          <li><strong>AI Recognition:</strong> The AI will analyze the mudra and show the detected gesture with confidence score.</li>
+          <li><strong>Chat &amp; Learn:</strong> Ask the assistant questions about mudras, meanings, and usage in Bharatanatyam.</li>
+          <li><strong>Explore More:</strong> Click any detected mudra name to view its dedicated page with detailed information.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; <span id="year"></span> Neya Navarasa. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="mudra-auth.js"></script>
+  <script src="mudra-ai.js"></script>
+</body>
+
+</html>

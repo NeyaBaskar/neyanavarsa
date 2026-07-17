@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Neya Navarasa Mudra AI</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body.auth-page {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 2rem;
+        background: linear-gradient(180deg, rgba(234, 228, 221, 1), rgba(181, 162, 147, 0.16));
+      }
+
+      .auth-shell {
+        width: min(560px, 100%);
+        background: rgba(255, 255, 255, 0.94);
+        border: 1px solid rgba(92, 74, 63, 0.18);
+        border-radius: 1.25rem;
+        box-shadow: 0 24px 50px rgba(21, 21, 21, 0.12);
+        padding: 2rem;
+      }
+
+      .auth-shell h1 {
+        margin-top: 0;
+        margin-bottom: 0.75rem;
+        font-size: clamp(2rem, 4vw, 2.5rem);
+      }
+
+      .auth-shell p {
+        margin: 0 0 1.75rem;
+        color: var(--text-muted);
+        line-height: 1.75;
+      }
+
+      .auth-form label {
+        display: block;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+      }
+
+      .auth-form input {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        border: 1px solid rgba(92, 74, 63, 0.2);
+        border-radius: 0.85rem;
+        margin-top: 0.35rem;
+        font: inherit;
+      }
+
+      .auth-form button {
+        width: 100%;
+        padding: 0.95rem 1rem;
+        margin-top: 1rem;
+        border: none;
+        border-radius: 0.85rem;
+        background: var(--accent-red);
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .auth-form button:hover {
+        background: #c12b1a;
+      }
+
+      .auth-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .auth-actions button {
+        flex: 1;
+        min-width: 140px;
+      }
+
+      .auth-feedback {
+        margin-top: 1rem;
+        color: var(--accent-red);
+        min-height: 1.25rem;
+      }
+
+      .auth-note {
+        margin-top: 1.5rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+      }
+
+      .auth-link {
+        color: var(--accent-red);
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+
+  <body class="auth-page">
+    <div class="auth-shell">
+      <h1>Sign in to Mudra AI</h1>
+      <p>
+        Access the Mudra recognition assistant, chat with the AI, and securely save your session data with Firebase.
+        Use your email and password to log in or create a new account.
+      </p>
+
+      <form id="auth-form" class="auth-form">
+        <label>
+          Email
+          <input type="email" id="auth-email" placeholder="you@example.com" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" id="auth-password" placeholder="At least 6 characters" minlength="6" required />
+        </label>
+
+        <div class="auth-actions">
+          <button type="submit" class="btn-send">Login</button>
+          <button type="button" class="btn-camera btn-secondary" id="toggle-auth-mode">Switch to Sign Up</button>
+        </div>
+
+        <p class="auth-feedback" id="auth-feedback"></p>
+      </form>
+
+      <p class="auth-note">
+        Already have an account? Enter your credentials and press Login. Need an account? Switch to Sign Up.
+      </p>
+      <p class="auth-note">
+        <a href="mudra-ai.html" class="auth-link">Back to Mudra AI page</a>
+      </p>
+    </div>
+
+    <script src="firebase-config.js"></script>
+    <script src="mudra-auth.js"></script>
+  </body>
+</html>
