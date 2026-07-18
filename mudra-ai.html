@@ -339,41 +339,7 @@
       font-size: 0.9rem;
     }
 
-    .image-grid-section {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-
-    .image-card {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(92, 74, 63, 0.1);
-      border-radius: 1rem;
-      overflow: hidden;
-      box-shadow: 0 14px 30px rgba(21, 21, 21, 0.08);
-    }
-
-    .image-card img {
-      width: 100%;
-      height: 220px;
-      object-fit: contain;
-      object-position: center;
-      display: block;
-      background: #f3efe9;
-    }
-
-    .image-card figcaption {
-      padding: 1rem;
-      font-size: 0.95rem;
-      color: var(--text-primary);
-      font-weight: 600;
-    }
+    /* Use the shared page-image-section and image-grid styles from styles.css */
 
     .site-header {
       flex-wrap: wrap;
@@ -568,7 +534,7 @@
       </div>
     </section>
 
-    <section class="section image-grid-section">
+    <section class="section page-image-section">
       <div>
         <h2>Visual Reference Library</h2>
         <p>Explore sample mudras, costume details, and performance expressions with curated visuals for each section.</p>
@@ -579,7 +545,7 @@
           <figcaption>Pataka Mudra</figcaption>
         </figure>
         <figure class="image-card">
-          <img src="images/mudras/Anjali.jpg" alt="Anjali mudra gesture" />
+          <img src="images/mudras/anjali.jpg" alt="Anjali mudra gesture" />
           <figcaption>Anjali Mudra</figcaption>
         </figure>
         <figure class="image-card">
@@ -587,15 +553,15 @@
           <figcaption>Mayura Mudra</figcaption>
         </figure>
         <figure class="image-card">
-          <img src="images/mudras/placeholder.svg" alt="Traditional Bharatanatyam costume details" />
+          <img src="images/costume & drapery.jpg" alt="Traditional Bharatanatyam costume details" />
           <figcaption>Costume Detail</figcaption>
         </figure>
         <figure class="image-card">
-          <img src="images/mudras/placeholder.svg" alt="Facial expression in dance" />
+          <img src="images/abhinaya scene.jpg" alt="Facial expression in dance" />
           <figcaption>Expression & Abhinaya</figcaption>
         </figure>
         <figure class="image-card">
-          <img src="images/mudras/placeholder.svg" alt="Performance stage styling" />
+          <img src="images/2A1A1992.jpg" alt="Performance stage styling" />
           <figcaption>Performance Styling</figcaption>
         </figure>
       </div>
